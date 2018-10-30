@@ -1,8 +1,19 @@
-version: '3'
+version: '2.1'
 
 services:
   db:
-    image: postgres
+    image: postgres:9.6
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: cloudscape
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: devpassword
+      PGPASSWORD: devpassword
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready --dbname cloudscape"]
+      interval: 10s
+      timeout: 30s
   web:
     build: .
     command: python3 manage.py runserver 0.0.0.0:8000
@@ -11,4 +22,5 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
